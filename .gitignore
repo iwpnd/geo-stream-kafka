@@ -1,8 +1,6 @@
 .python-version
 /.vscode/
 *.code-workspace
-todo.txt
-*.ipynb
 .env
 .DS_Store
 
