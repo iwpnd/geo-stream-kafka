@@ -4,3 +4,4 @@ loguru
 pytest
 pytest-cov
 uvicorn
+requests

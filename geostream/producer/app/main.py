@@ -4,5 +4,5 @@ app = FastAPI()
 
 
 @app.get("/ping")
-def read_root():
+def ping():
     return {"ping": "pong!"}
