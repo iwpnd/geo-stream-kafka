@@ -1,0 +1,6 @@
+fastapi
+pykafka
+loguru
+pytest
+pytest-cov
+uvicorn

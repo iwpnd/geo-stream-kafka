@@ -17,6 +17,22 @@ services:
     depends_on:
       - "zookeeper"
   producer:
-    build: ./geostream/producer/
+    build:
+      context: ./geostream
+      dockerfile: Dockerfile-producer
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
+    volumes:
+        - ./geostream/producer/:/usr/src/producer
+    ports:
+        - 8002:8000
+    image: geostream-producer:latest
   consumer:
-    build: ./geostream/consumer/
+    build:
+        context: ./geostream
+        dockerfile: Dockerfile-consumer
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8001
+    volumes:
+        - ./geostream/consumer/:/usr/src/consumer
+    ports:
+        - 8003:8001
+    image: geostream-consumer:latest
