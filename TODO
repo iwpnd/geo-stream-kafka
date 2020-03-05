@@ -1,0 +1,15 @@
+producer:
+    datamodel:
+        ✔ data model @done(20-03-05 11:39)
+            ✔ name as string @done(20-03-05 11:39)
+            ✔ message_id as str from name and uuid.uuid4() @done(20-03-05 11:39)
+            ✔ timestamp as str as datetime.utcnow() @done(20-03-05 11:39)
+            ✔ lat as confloat  -90 < x < 90 @done(20-03-05 11:39)
+            ✔ lon as confloat  -180 < x < 180 @done(20-03-05 11:39)
+        ✔ test data model @done(20-03-05 11:39)
+
+    endpoint:
+        ☐ add /producer/<topic> endpoint
+
+consumer:
+    ☐ response model

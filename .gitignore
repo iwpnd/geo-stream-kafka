@@ -3,6 +3,7 @@
 *.code-workspace
 .env
 .DS_Store
+TODO
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
