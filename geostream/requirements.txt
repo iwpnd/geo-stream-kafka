@@ -1,5 +1,4 @@
 fastapi
-pykafka
 aiokafka
 loguru
 pytest

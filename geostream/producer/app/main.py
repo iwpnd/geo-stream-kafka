@@ -5,7 +5,6 @@ from aiokafka import AIOKafkaProducer
 from app.core.models.model import ProducerMessage
 from fastapi import FastAPI
 from loguru import logger
-from pykafka import KafkaClient
 
 app = FastAPI()
 
@@ -26,26 +25,13 @@ async def shutdown_event():
     await aioproducer.stop()
 
 
-client = KafkaClient(hosts="kafka:9092")
-topic = client.topics["geostream"]
-producer = topic.get_sync_producer()
-
-
 @app.post("/producer/{topicname}")
-async def geostream_produce(msg: ProducerMessage, topicname: str):
-    logger.debug(topicname)
-    logger.debug(producer)
-    producer.produce(json.dumps(msg.dict()).encode("ascii"))
-
-
-@app.post("/aioproducer/{topicname}")
 async def aio_geostream_produce(msg: ProducerMessage, topicname: str):
-    logger.debug(topicname)
-    logger.debug(producer)
+
     result = await aioproducer.send_and_wait(
         topicname, json.dumps(msg.dict()).encode("ascii")
     )
-    print(result)
+    logger.debug(result)
 
 
 @app.get("/ping")
