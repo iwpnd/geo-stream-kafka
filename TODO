@@ -9,7 +9,19 @@ producer:
         ✔ test data model @done(20-03-05 11:39)
 
     endpoint:
-        ☐ add /producer/<topic> endpoint
+        ☐ add /producer/<topicname> endpoint
+            ☐ add aiokafka producer to handle incoming requests async and not block
+        ☐ test /producer/<topicname> endpoint
 
 consumer:
     ☐ response model
+
+
+
+TIL
+
+why do I need pykafka for aiokafka producer to connect?
+
+It doesn't. The problem is that producer does not wait for Kafka to accept connections, so ConnectionError is thrown
+on start-up. So by installing pykafka and restarting the producer-container I coincidally waited for kafka/zookeeper to
+be up and running.

@@ -8,15 +8,14 @@ from loguru import logger
 
 app = FastAPI()
 
-aioproducer = None
+loop = asyncio.get_event_loop()
+aioproducer = AIOKafkaProducer(
+    loop=loop, client_id="geostream-kafka", bootstrap_servers="kafka:9092"
+)
 
 
 @app.on_event("startup")
 async def startup_event():
-    global aioproducer
-    loop = asyncio.get_event_loop()
-    aioproducer = AIOKafkaProducer(loop=loop, bootstrap_servers="kafka:9092")
-
     await aioproducer.start()
 
 
@@ -25,14 +24,14 @@ async def shutdown_event():
     await aioproducer.stop()
 
 
-@app.post("/aioproducer/{topicname}")
-async def aio_geostream_produce(msg: ProducerMessage, topicname: str):
-    logger.debug(topicname)
-    logger.debug(aioproducer)
+@app.post("/producer/{topicname}")
+async def kafka_produce(msg: ProducerMessage, topicname: str):
+
     result = await aioproducer.send_and_wait(
         topicname, json.dumps(msg.dict()).encode("ascii")
     )
-    print(result)
+
+    logger.debug(result)
 
 
 @app.get("/ping")
