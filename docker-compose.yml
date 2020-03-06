@@ -20,16 +20,25 @@ services:
     build:
       context: ./geostream
       dockerfile: Dockerfile-producer
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
         - ./geostream/producer/:/usr/src/producer
     ports:
         - 8002:8000
     image: geostream-producer:latest
+
   consumer:
     build:
         context: ./geostream
         dockerfile: Dockerfile-consumer
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8001
     volumes:
         - ./geostream/consumer/:/usr/src/consumer

@@ -25,13 +25,14 @@ async def shutdown_event():
     await aioproducer.stop()
 
 
-@app.post("/producer/{topicname}")
+@app.post("/aioproducer/{topicname}")
 async def aio_geostream_produce(msg: ProducerMessage, topicname: str):
-
+    logger.debug(topicname)
+    logger.debug(aioproducer)
     result = await aioproducer.send_and_wait(
         topicname, json.dumps(msg.dict()).encode("ascii")
     )
-    logger.debug(result)
+    print(result)
 
 
 @app.get("/ping")
