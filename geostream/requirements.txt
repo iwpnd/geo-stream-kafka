@@ -1,5 +1,6 @@
 fastapi
 pykafka
+aiokafka
 loguru
 pytest
 pytest-cov
