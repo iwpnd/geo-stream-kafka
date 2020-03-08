@@ -29,6 +29,8 @@ services:
         - ./geostream/producer/:/usr/src/producer
     ports:
         - 8002:8000
+    env_file:
+      - ./geostream/.env
     image: geostream-producer:latest
 
   consumer:

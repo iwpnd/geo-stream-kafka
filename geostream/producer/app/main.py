@@ -2,29 +2,29 @@ import asyncio
 import json
 
 from aiokafka import AIOKafkaProducer
+from app.core.config import KAFKA_INSTANCE
+from app.core.config import PROJECT_NAME
 from app.core.models.model import ProducerMessage
 from app.core.models.model import ProducerResponse
 from fastapi import FastAPI
 from loguru import logger
 
-app = FastAPI(title="geostream_kafka_producer")
+app = FastAPI(title=PROJECT_NAME)
 
 
 loop = asyncio.get_event_loop()
 aioproducer = AIOKafkaProducer(
-    loop=loop, client_id="geostream-kafka-producer", bootstrap_servers="kafka:9092"
+    loop=loop, client_id=PROJECT_NAME, bootstrap_servers=KAFKA_INSTANCE
 )
 
 
 @app.on_event("startup")
 async def startup_event():
-    logger.debug("starting aiokafka producer")
     await aioproducer.start()
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.debug("stopping aiokafka producer")
     await aioproducer.stop()
 
 
@@ -44,7 +44,7 @@ async def kafka_produce(msg: ProducerMessage, topicname: str):
         topicname, json.dumps(msg.dict()).encode("ascii")
     )
 
-    logger.debug(result)
+    logger.info(result)
 
     response = ProducerResponse(
         name=msg.name,
