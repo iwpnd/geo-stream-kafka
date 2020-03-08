@@ -3,6 +3,7 @@ import json
 
 from aiokafka import AIOKafkaProducer
 from app.core.models.model import ProducerMessage
+from app.core.models.model import ProducerResponse
 from fastapi import FastAPI
 from loguru import logger
 
@@ -32,6 +33,15 @@ async def kafka_produce(msg: ProducerMessage, topicname: str):
     )
 
     logger.debug(result)
+
+    response = ProducerResponse(
+        name=msg.name,
+        message_id=msg.message_id,
+        topic=topicname,
+        timestamp=result.timestamp,
+    )
+
+    return response
 
 
 @app.get("/ping")
