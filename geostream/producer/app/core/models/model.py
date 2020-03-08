@@ -24,3 +24,14 @@ class ProducerMessage(BaseModel):
     @validator("timestamp", pre=True, always=True)
     def set_date_now(cls, v):
         return str(datetime.now())
+
+
+class ProducerResponse(BaseModel):
+    name: StrictStr
+    message_id: StrictStr
+    topic: StrictStr
+    timestamp: str
+
+    @validator("timestamp", pre=True, always=True)
+    def unix_to_str(cls, v):
+        return str(datetime.utcfromtimestamp(int(v) / 1000))

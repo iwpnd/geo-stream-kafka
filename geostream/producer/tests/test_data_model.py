@@ -1,5 +1,6 @@
 import pytest
 from app.core.models.model import ProducerMessage
+from app.core.models.model import ProducerResponse
 from pydantic import ValidationError
 
 
@@ -63,3 +64,28 @@ def test_producer_message_raises(id, name, lat, lon, expectation):
         msg = ProducerMessage(name=name, lat=lat, lon=lon)
 
         assert isinstance(msg, ProducerMessage)
+
+
+@pytest.mark.parametrize(
+    "id, name, message_id, topic, timestamp, expectation",
+    [
+        pytest.param(
+            1,
+            "messenger_1",
+            "messenger_1_01f6c2d1-6bdd-4ba0-98ab-2f00a816bc57",
+            "test",
+            1583656501779,
+            "2020-03-08 08:35:01.779000",
+            id="timestamp to string",
+        )
+    ],
+)
+def test_producer_response_timestamp_conversion(
+    id, name, message_id, topic, timestamp, expectation
+):
+
+    response = ProducerResponse(
+        name=name, message_id=message_id, topic=topic, timestamp=timestamp
+    )
+
+    assert response.timestamp == expectation
