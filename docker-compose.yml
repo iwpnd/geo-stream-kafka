@@ -32,7 +32,6 @@ services:
     env_file:
       - ./geostream/.env
     image: geostream-producer:latest
-
   consumer:
     build:
         context: ./geostream
@@ -46,4 +45,6 @@ services:
         - ./geostream/consumer/:/usr/src/consumer
     ports:
         - 8003:8001
+    env_file:
+      - ./geostream/.env
     image: geostream-consumer:latest
