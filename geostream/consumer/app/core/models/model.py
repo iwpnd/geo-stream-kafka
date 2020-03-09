@@ -1,15 +1,12 @@
-from datetime import datetime
-
 from pydantic import BaseModel
+from pydantic import confloat
 from pydantic import StrictStr
-from pydantic import validator
 
 
 class ConsumerResponse(BaseModel):
     topic: StrictStr
     timestamp: str
-    data: dict
-
-    @validator("timestamp", pre=True, always=True)
-    def unix_to_str(cls, v):
-        return str(datetime.utcfromtimestamp(int(v) / 1000))
+    name: StrictStr
+    message_id: StrictStr
+    lat: confloat(gt=-90, lt=90)
+    lon: confloat(gt=-180, lt=180)
