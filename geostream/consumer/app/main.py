@@ -1,5 +1,6 @@
 import asyncio
 import json
+import typing
 
 from aiokafka import AIOKafkaConsumer
 from app.core.config import KAFKA_INSTANCE
@@ -8,6 +9,7 @@ from app.core.models.model import ConsumerResponse
 from fastapi import FastAPI
 from fastapi import WebSocket
 from loguru import logger
+from starlette.endpoints import WebSocketEndpoint
 from starlette.middleware.cors import CORSMiddleware
 
 
@@ -39,8 +41,8 @@ async def consume(topicname):
         await consumer.stop()
 
 
-@app.websocket("/consumer/{topicname}")
-async def kafka_consumer_ws(websocket: WebSocket, topicname: str, debug: bool = False):
+@app.websocket_route("/consumer/{topicname}")
+class WebsocketConsumer(WebSocketEndpoint):
     """
     Consume messages from <topicname>
 
@@ -51,13 +53,31 @@ async def kafka_consumer_ws(websocket: WebSocket, topicname: str, debug: bool = 
     * return ConsumerResponse
     """
 
-    await websocket.accept()
+    async def on_connect(self, websocket: WebSocket) -> None:
+        topicname = websocket["path"].split("/")[2]  # until I figure out an alternative
 
-    while True:
-        data = await consume(topicname)
-        response = ConsumerResponse(topic=topicname, **json.loads(data))
-        logger.debug(response)
-        await websocket.send_text(f"{response.json()}")
+        await websocket.accept()
+        await websocket.send_json({"Message: ": "connected"})
+
+        self.consumer_task = asyncio.create_task(
+            self.send_consumer_message(websocket=websocket, topicname=topicname)
+        )
+
+        logger.info("connected")
+
+    async def on_disconnect(self, websocket: WebSocket, close_code: int) -> None:
+        self.consumer_task.cancel()
+        logger.info("disconnected")
+
+    async def on_receive(self, websocket: WebSocket, data: typing.Any) -> None:
+        await websocket.send_json({"Message: ": data})
+
+    async def send_consumer_message(self, websocket: WebSocket, topicname: str) -> None:
+        while True:
+            data = await consume(topicname)
+            response = ConsumerResponse(topic=topicname, **json.loads(data))
+            logger.info(response)
+            await websocket.send_text(f"{response.json()}")
 
 
 @app.get("/ping")
