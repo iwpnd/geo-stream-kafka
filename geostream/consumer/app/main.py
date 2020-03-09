@@ -40,7 +40,7 @@ async def consume(topicname):
 
 
 @app.websocket("/consumer/{topicname}")
-async def kafka_consumer_ws_endpoint(websocket: WebSocket, topicname: str):
+async def kafka_consumer_ws(websocket: WebSocket, topicname: str):
     """
     Consume messages from <topicname>
 
