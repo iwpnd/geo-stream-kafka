@@ -40,7 +40,7 @@ async def consume(topicname):
 
 
 @app.websocket("/consumer/{topicname}")
-async def kafka_consumer_ws(websocket: WebSocket, topicname: str):
+async def kafka_consumer_ws(websocket: WebSocket, topicname: str, debug: bool = False):
     """
     Consume messages from <topicname>
 
@@ -52,6 +52,7 @@ async def kafka_consumer_ws(websocket: WebSocket, topicname: str):
     """
 
     await websocket.accept()
+
     while True:
         data = await consume(topicname)
         response = ConsumerResponse(topic=topicname, **json.loads(data))
