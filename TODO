@@ -7,21 +7,38 @@ producer:
             ✔ lat as confloat  -90 < x < 90 @done(20-03-05 11:39)
             ✔ lon as confloat  -180 < x < 180 @done(20-03-05 11:39)
         ✔ test data model @done(20-03-05 11:39)
+    responsemodel:
+        ✔ add responsemodel @done(20-03-08 10:58)
+        ✔ test responsemodel with monkeypatch @done(20-03-08 10:58)
 
     endpoint:
-        ☐ add /producer/<topicname> endpoint
-            ☐ add aiokafka producer to handle incoming requests async and not block
-        ☐ test /producer/<topicname> endpoint
+        ✔ add /producer/<topicname> endpoint @done(20-03-06 15:34)
+            ✔ add aiokafka producer to handle incoming requests async and not block @done(20-03-06 12:55)
+        ✔ test /producer/<topicname> endpoint @done(20-03-06 15:34)
+
+    ☐ add .env file and add it to config.py in /core
 
 consumer:
-    ☐ response model
+    datamodel:
+     ☐ response model
+     ☐ test response model
+
+     endpoint:
+        ☐ add /consumer/<topicname> endpoint
+        ☐ test /consumer/<topicname> endpoint
+
 
 
 
 TIL
 
 why do I need pykafka for aiokafka producer to connect?
-
 It doesn't. The problem is that producer does not wait for Kafka to accept connections, so ConnectionError is thrown
 on start-up. So by installing pykafka and restarting the producer-container I coincidally waited for kafka/zookeeper to
 be up and running.
+
+Looks like there is currently no way to mock aiokafka requests (see https://github.com/aio-libs/aiokafka/issues/561)
+>> you can however mock the POST and the aiokafkaproducer send_and_wait()
+
+When you try to write to a topic that doesn't yet exist,
+both vanilla kafka-python and aiokafka silently create the topic before writing to it
