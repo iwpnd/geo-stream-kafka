@@ -40,17 +40,12 @@ async def kafka_produce(msg: ProducerMessage, topicname: str):
     * return ProducerResponse
     """
 
-    result = await aioproducer.send_and_wait(
-        topicname, json.dumps(msg.dict()).encode("ascii")
-    )
+    result = await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
 
     logger.info(result)
 
     response = ProducerResponse(
-        name=msg.name,
-        message_id=msg.message_id,
-        topic=topicname,
-        timestamp=result.timestamp,
+        name=msg.name, message_id=msg.message_id, topic=topicname
     )
 
     return response

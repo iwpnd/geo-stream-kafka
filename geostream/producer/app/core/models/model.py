@@ -22,16 +22,16 @@ class ProducerMessage(BaseModel):
             raise ValueError("name not set")
 
     @validator("timestamp", pre=True, always=True)
-    def set_date_now(cls, v):
-        return str(datetime.now())
+    def set_datetime_utcnow(cls, v):
+        return str(datetime.utcnow())
 
 
 class ProducerResponse(BaseModel):
     name: StrictStr
     message_id: StrictStr
     topic: StrictStr
-    timestamp: str
+    timestamp: StrictStr = ""
 
     @validator("timestamp", pre=True, always=True)
-    def unix_to_str(cls, v):
-        return str(datetime.utcfromtimestamp(int(v) / 1000))
+    def set_datetime_utcnow(cls, v):
+        return str(datetime.utcnow())

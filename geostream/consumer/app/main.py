@@ -17,28 +17,9 @@ app = FastAPI(title=PROJECT_NAME)
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
 
 
-async def consume(topicname):
-    loop = asyncio.get_event_loop()
-    consumer = AIOKafkaConsumer(
-        topicname,
-        loop=loop,
-        client_id=PROJECT_NAME,
-        bootstrap_servers=KAFKA_INSTANCE,
-        # group_id="my_group",
-        enable_auto_commit=False,
-        session_timeout_ms=10000,
-        connections_max_idle_ms=120000,
-    )
-
-    await consumer.start()
-    try:
-        # Consume messages
-        async for msg in consumer:
-            return msg.value.decode()
-
-    finally:
-        # Will leave consumer group; perform autocommit if enabled.
-        await consumer.stop()
+async def consume(consumer, topicname):
+    async for msg in consumer:
+        return msg.value.decode()
 
 
 @app.websocket_route("/consumer/{topicname}")
@@ -59,6 +40,17 @@ class WebsocketConsumer(WebSocketEndpoint):
         await websocket.accept()
         await websocket.send_json({"Message: ": "connected"})
 
+        loop = asyncio.get_event_loop()
+        self.consumer = AIOKafkaConsumer(
+            topicname,
+            loop=loop,
+            client_id=PROJECT_NAME,
+            bootstrap_servers=KAFKA_INSTANCE,
+            enable_auto_commit=False,
+        )
+
+        await self.consumer.start()
+
         self.consumer_task = asyncio.create_task(
             self.send_consumer_message(websocket=websocket, topicname=topicname)
         )
@@ -67,8 +59,10 @@ class WebsocketConsumer(WebSocketEndpoint):
 
     async def on_disconnect(self, websocket: WebSocket, close_code: int) -> None:
         self.consumer_task.cancel()
+        await self.consumer.stop()
         logger.info(f"counter: {self.counter}")
         logger.info("disconnected")
+        logger.info("consumer stopped")
 
     async def on_receive(self, websocket: WebSocket, data: typing.Any) -> None:
         await websocket.send_json({"Message: ": data})
@@ -76,7 +70,7 @@ class WebsocketConsumer(WebSocketEndpoint):
     async def send_consumer_message(self, websocket: WebSocket, topicname: str) -> None:
         self.counter = 0
         while True:
-            data = await consume(topicname)
+            data = await consume(self.consumer, topicname)
             response = ConsumerResponse(topic=topicname, **json.loads(data))
             logger.info(response)
             await websocket.send_text(f"{response.json()}")
