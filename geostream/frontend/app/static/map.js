@@ -6,6 +6,8 @@ var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     osm = new L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttribution});
 
+var colors = ["#8be9fd", "#50fa7b", "#ffb86c", "#ff79c6", "#bd93f9", "#ff5555", "#f1fa8c"];
+
 map.setView([52.521677, 13.391777], 15).addLayer(osm);
 
 lines = {};
@@ -17,14 +19,15 @@ ws.onmessage = function(event) {
     obj = JSON.parse(event.data)
 
     if(!(obj.name in lines)) {
-      lines[obj.name] = [];
-      lines[obj.name].push([obj.lat, obj.lon]);
+      lines[obj.name] = {"latlon": []};
+      lines[obj.name]["latlon"].push([obj.lat, obj.lon]);
+      lines[obj.name]["config"] = {"color": colors[Math.floor(Math.random()*colors.length)]};
     }
     else {
-      lines[obj.name].push([obj.lat, obj.lon]);
+      lines[obj.name]["latlon"].push([obj.lat, obj.lon]);
     }
 
-    line = L.polyline(lines[obj.name], {color: 'blue', radius: 100})
+    line = L.polyline(lines[obj.name]["latlon"], {color: lines[obj.name]["config"]["color"]})
     linesLayer.addLayer(line)
     map.addLayer(linesLayer);
 
