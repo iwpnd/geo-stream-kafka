@@ -1,5 +1,5 @@
 var map = new L.Map('map');
-var markersLayer = new L.LayerGroup();
+var linesLayer = new L.LayerGroup();
 var ws = new WebSocket("ws://127.0.0.1:8003/consumer/geostream");
 
 var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -8,21 +8,25 @@ var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 
 map.setView([52.521677, 13.391777], 15).addLayer(osm);
 
-mapmarkers = {};
+lines = {};
+
+map.on("zoomend", function (e) { linesLayer.clearLayers() });
 
 ws.onmessage = function(event) {
     console.log(event.data)
-    console.log(mapmarkers)
+    console.log(lines)
     obj = JSON.parse(event.data)
 
-    if(!(obj.name in mapmarkers)) {
-      mapmarkers[obj.name] = [];
-      mapmarkers[obj.name].push([obj.lat, obj.lon]);
+    if(!(obj.name in lines)) {
+      lines[obj.name] = [];
+      lines[obj.name].push([obj.lat, obj.lon]);
     }
     else {
-      mapmarkers[obj.name].push([obj.lat, obj.lon]);
+      lines[obj.name].push([obj.lat, obj.lon]);
     }
 
-    marker = L.polyline(mapmarkers[obj.name], {color: 'blue', radius: 100}).addTo(map);
+    line = L.polyline(lines[obj.name], {color: 'blue', radius: 100})
+    linesLayer.addLayer(line)
+    map.addLayer(linesLayer);
 
 };
