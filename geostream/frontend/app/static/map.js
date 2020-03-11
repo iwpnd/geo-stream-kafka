@@ -2,8 +2,8 @@ var map = new L.Map('map');
 var linesLayer = new L.LayerGroup();
 var ws = new WebSocket("ws://127.0.0.1:8003/consumer/geostream");
 
-var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+var osmUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     osm = new L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttribution});
 
 var colors = ["#8be9fd", "#50fa7b", "#ffb86c", "#ff79c6", "#bd93f9", "#ff5555", "#f1fa8c"];
