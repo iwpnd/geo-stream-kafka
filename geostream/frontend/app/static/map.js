@@ -14,7 +14,6 @@ map.on("zoomend", function (e) { linesLayer.clearLayers() });
 
 ws.onmessage = function(event) {
     console.log(event.data)
-    console.log(lines)
     obj = JSON.parse(event.data)
 
     if(!(obj.name in lines)) {

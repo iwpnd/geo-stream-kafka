@@ -67,17 +67,20 @@ class WebsocketConsumer(WebSocketEndpoint):
 
     async def on_disconnect(self, websocket: WebSocket, close_code: int) -> None:
         self.consumer_task.cancel()
+        logger.info(f"counter: {self.counter}")
         logger.info("disconnected")
 
     async def on_receive(self, websocket: WebSocket, data: typing.Any) -> None:
         await websocket.send_json({"Message: ": data})
 
     async def send_consumer_message(self, websocket: WebSocket, topicname: str) -> None:
+        self.counter = 0
         while True:
             data = await consume(topicname)
             response = ConsumerResponse(topic=topicname, **json.loads(data))
             logger.info(response)
             await websocket.send_text(f"{response.json()}")
+            self.counter = self.counter + 1
 
 
 @app.get("/ping")
