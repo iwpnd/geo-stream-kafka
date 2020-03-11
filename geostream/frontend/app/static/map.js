@@ -1,23 +1,25 @@
-var map = L.map('map').setView([52.531677, 13.381777], 13);
+var map = new L.Map('map');
+var markersLayer = new L.LayerGroup();
+var ws = new WebSocket("ws://127.0.0.1:8003/consumer/geostream");
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    osmAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    osm = new L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttribution});
+
+map.setView([52.521677, 13.391777], 15).addLayer(osm);
 
 mapmarkers = {};
 
-var ws = new WebSocket("ws://127.0.0.1:8003/consumer/geostream");
 ws.onmessage = function(event) {
     console.log(event.data)
+    console.log(mapmarkers)
     obj = JSON.parse(event.data)
 
     if(!(obj.name in mapmarkers)) {
       mapmarkers[obj.name] = [];
-      console.log(mapmarkers)
       mapmarkers[obj.name].push([obj.lat, obj.lon]);
     }
     else {
-      console.log(mapmarkers)
       mapmarkers[obj.name].push([obj.lat, obj.lon]);
     }
 
