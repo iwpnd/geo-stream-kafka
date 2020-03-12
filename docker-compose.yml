@@ -19,7 +19,7 @@ services:
   producer:
     build:
       context: ./geostream
-      dockerfile: Dockerfile-producer
+      dockerfile: Dockerfile
     image: geostream-fastapi:latest
     depends_on:
       - kafka
