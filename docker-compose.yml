@@ -20,31 +20,29 @@ services:
     build:
       context: ./geostream
       dockerfile: Dockerfile-producer
+    image: geostream-fastapi:latest
     depends_on:
       - kafka
       - zookeeper
     restart: unless-stopped
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8000
     volumes:
-        - ./geostream/producer/:/usr/src/producer
+        - ./geostream/producer/:/usr/src/app
     ports:
         - 8002:8000
     env_file:
       - ./geostream/.env
-    image: geostream-producer:latest
+
   consumer:
-    build:
-        context: ./geostream
-        dockerfile: Dockerfile-consumer
+    image: geostream-fastapi:latest
     depends_on:
       - kafka
       - zookeeper
     restart: unless-stopped
     command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8001
     volumes:
-        - ./geostream/consumer/:/usr/src/consumer
+        - ./geostream/consumer/:/usr/src/app
     ports:
         - 8003:8001
     env_file:
       - ./geostream/.env
-    image: geostream-consumer:latest
