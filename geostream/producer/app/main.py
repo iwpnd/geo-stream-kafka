@@ -11,7 +11,6 @@ from loguru import logger
 
 app = FastAPI(title=PROJECT_NAME)
 
-
 loop = asyncio.get_event_loop()
 aioproducer = AIOKafkaProducer(
     loop=loop, client_id=PROJECT_NAME, bootstrap_servers=KAFKA_INSTANCE
@@ -40,14 +39,11 @@ async def kafka_produce(msg: ProducerMessage, topicname: str):
     * return ProducerResponse
     """
 
-    result = await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
-
-    logger.info(result)
-
+    await aioproducer.send(topicname, json.dumps(msg.dict()).encode("ascii"))
     response = ProducerResponse(
         name=msg.name, message_id=msg.message_id, topic=topicname
     )
-
+    logger.info(response)
     return response
 
 
